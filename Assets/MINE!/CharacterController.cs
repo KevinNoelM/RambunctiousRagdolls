@@ -7,34 +7,41 @@ public class CharacterController : MonoBehaviour
     private Rigidbody rightFoot, leftFoot;
 
     [SerializeField]
-    private Rigidbody rightArm, leftArm;
+    private Rigidbody rightArm, leftArm, body;
 
     [SerializeField]
-    private float force,  armAttack;
+    private float force, armAttack;
 
     [SerializeField]
-    private Vector3 movementVector;
+    private Vector3 movementVector, bodyTorque;
+
+    private bool wasLastLegRight = false;
 
 	private void Update ()
     {
 	    if (Input.GetKeyDown(KeyCode.W))
         {
-            rightFoot.AddRelativeForce(movementVector * force, ForceMode.Impulse);
+            float direction = Input.GetAxis("Horizontal");
+            Vector3 legForce = movementVector * force;
+
+            if (wasLastLegRight)
+            {
+                leftFoot.AddRelativeForce(legForce, ForceMode.Impulse);
+            }
+            else
+            {
+                rightFoot.AddRelativeForce(legForce, ForceMode.Impulse);
+            }
+            wasLastLegRight = !wasLastLegRight;
         }
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKey(KeyCode.A))
         {
-            leftFoot.AddRelativeForce(movementVector * force, ForceMode.Impulse);
+            body.transform.eulerAngles -= bodyTorque;
         }
-
-        if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.D))
         {
-            rightFoot.AddForce(-movementVector * force, ForceMode.Impulse);
-        }
-
-        if (Input.GetKey(KeyCode.D))
-        {
-            leftFoot.AddForce(-movementVector * force, ForceMode.Impulse);
+            body.transform.eulerAngles += bodyTorque;
         }
 
         if (Input.GetKeyDown(KeyCode.I))
